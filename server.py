@@ -38,14 +38,19 @@ def get_open_competitions(competitions):
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    club = [club for club in clubs if club['email'] == request.form['email']][0]
-    # affichage des compétitions futures
-    list_compet = get_open_competitions(competitions)
-    if list_compet:
-        return render_template('welcome.html', club=club, competitions=list_compet)
-    else:
-        flash("No coming competition")
-        return render_template('welcome.html',club=club,competitions="")
+    # check given email is an authorized login
+    try:
+        club = [club for club in clubs if club['email'] == request.form['email']][0]
+        # affichage des compétitions futures
+        list_compet = get_open_competitions(competitions)
+        if list_compet:
+            return render_template('welcome.html', club=club, competitions=list_compet)
+        else:
+            flash("No coming competition")
+            return render_template('welcome.html', club=club, competitions="")
+    except IndexError:
+        flash("Login error, please try again.")
+        return render_template('index.html')
 
 
 @app.route('/book/<competition>/<club>')
