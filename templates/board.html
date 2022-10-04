@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clubs Board | GUDLFT</title>
+</head>
+<body>
+ <h2>POINTS BOARD</h2>
+    <table style="margin:10px; border: 1px; border-color: #1e1e1e; background-color: #e7e7e7; padding: 5px">
+        <thead>
+            <tr>
+                <th colspan="2">Clubs</th>
+            </tr>
+            <tr>
+                <th>Nom</th>
+                <th>Points</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for club in clubs%}
+                <tr>
+                    <td>{{club['name']}}</td>
+                    <td style="text-align: right">{{club['points']}} points</td>
+                </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a href="{{url_for('index')}}">Back to index</a>
+
+</body>
+</html>
