@@ -69,7 +69,25 @@ def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
     placesRequired = int(request.form['places'])
-    competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
+    placesAvailable = int(competition['numberOfPlaces'])
+    club_points = int(club['points'])
+    # UC: tournoi complet
+    if placesAvailable <= 0:
+        flash('Sorry, complete tournament!')
+        return render_template('welcome.html', club=club, competitions=competitions)
+    # Nombre de place demandé doit être + et inférieur à 12
+    # et inférieur au nombre de places disponibles
+    if placesRequired <= 0 or placesRequired > 12\
+            or placesRequired > placesAvailable:
+        flash('Something went wrong : incorrect number of places')
+        return render_template('booking.html', club=club, competition=competition)
+    # UC: club n'a pas assez de points
+    if placesRequired > club_points:
+        flash('No enough points!')
+        return render_template('booking.html', club=club, competition=competition)
+    # cas passant: maj points
+    competition['numberOfPlaces'] = placesAvailable-placesRequired
+    club['points'] = club_points-placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
     # chris : manque blocage si pas de place dispo
