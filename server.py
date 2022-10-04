@@ -1,5 +1,6 @@
 import json
 from flask import Flask,render_template,request,redirect,flash,url_for
+import datetime
 
 
 def loadClubs():
@@ -24,10 +25,27 @@ clubs = loadClubs()
 def index():
     return render_template('index.html')
 
+
+# Function to convert string to datetime
+def convert_strToDate(date_time):
+    datetime_str = datetime.datetime.strptime(date_time, '%Y-%m-%d %H:%M:%S')
+    return datetime_str
+
+def get_open_competitions(competitions):
+    open_comp = [c for c in competitions if convert_strToDate(c['date']) > datetime.datetime.now()]
+    return open_comp
+
+
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
     club = [club for club in clubs if club['email'] == request.form['email']][0]
-    return render_template('welcome.html',club=club,competitions=competitions)
+    # affichage des compétitions futures
+    list_compet = get_open_competitions(competitions)
+    if list_compet:
+        return render_template('welcome.html', club=club, competitions=list_compet)
+    else:
+        flash("No coming competition")
+        return render_template('welcome.html',club=club,competitions="")
 
 
 @app.route('/book/<competition>/<club>')
@@ -49,7 +67,9 @@ def purchasePlaces():
     competition['numberOfPlaces'] = int(competition['numberOfPlaces'])-placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
-
+    # chris : manque blocage si pas de place dispo
+    # (en l'état le nb de places peut être négatif : ne devrait pas etre negatif)
+    # la maj du nb de places n'est pas sauvegardée dans le fichier
 
 # TODO: Add route for points display
 
