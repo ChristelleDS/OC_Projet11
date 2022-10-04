@@ -75,8 +75,8 @@ def purchasePlaces():
     if placesAvailable <= 0:
         flash('Sorry, complete tournament!')
         return render_template('welcome.html', club=club, competitions=competitions)
-    # Nombre de place demandé doit être + et inférieur à 12
-    # et inférieur au nombre de places disponibles
+    # Nombre de place demandé >= 0 et < 12
+    # et < au nombre de places disponibles
     if placesRequired <= 0 or placesRequired > 12\
             or placesRequired > placesAvailable:
         flash('Something went wrong : incorrect number of places')
@@ -90,9 +90,6 @@ def purchasePlaces():
     club['points'] = club_points-placesRequired
     flash('Great-booking complete!')
     return render_template('welcome.html', club=club, competitions=competitions)
-    # chris : manque blocage si pas de place dispo
-    # (en l'état le nb de places peut être négatif : ne devrait pas etre negatif)
-    # la maj du nb de places n'est pas sauvegardée dans le fichier
 
 # TODO: Add route for points display
 
