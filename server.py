@@ -32,7 +32,7 @@ def showSummary():
         return render_template('welcome.html', club=club, competitions=competitions)
     except IndexError:
         flash("Login error, please try again.")
-        return render_template('index.html')
+        return redirect(url_for('index'))
 
 
 @app.route('/book/<competition>/<club>')
