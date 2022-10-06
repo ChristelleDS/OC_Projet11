@@ -5,6 +5,7 @@ from .conftest import auth_data, client, clubs_data, competitions_data, \
 import pytest
 import datetime
 import requests
+import re
 
 """
 def test_loadClubs(clubs_data):
@@ -173,11 +174,13 @@ def test_purchasePlaces_NotEnoughPoints(compet_open, club_1, client):
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': placesRequired}
-    response = client.post('/purchasePlaces', data=form)
+    response = client.post('/purchasePlaces', data=form, follow_redirects=True)
     assert response.status_code == 200
     html = response.data.decode()
+    # html = response.content
     # points_before > placesRequired
     assert "Not enough points" in html
+    # assert re.search('Not enough points', response.get_data(as_text=True)) == True
 
 
 def test_purchasePlaces_OK(compet_open, club_1, client):
