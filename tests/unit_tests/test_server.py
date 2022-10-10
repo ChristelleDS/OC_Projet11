@@ -5,7 +5,7 @@ from .conftest import auth_data, client, clubs_data, competitions_data, \
 import pytest
 import datetime
 import requests
-import re
+from flask import session
 
 """
 def test_loadClubs(clubs_data):
@@ -37,14 +37,25 @@ def test_showSummary(client, auth_data, competitions_data):
     """
     response = client.post('/showSummary', data={'email': auth_data["email"]})
     assert response.status_code == 200
-    html = response.data.decode()
-    assert "<title>Summary | GUDLFT Registration</title>" in html
+    assert b"<title>Summary | GUDLFT Registration</title>" in response.data
     open_competitions = get_open_competitions(competitions_data)
-    if open_competitions:
-        for c in open_competitions:
-            assert c['name'] in html
-    else:
-        assert 'No coming competition' in html
+    for c in open_competitions:
+        assert c['name'] in response.data
+
+
+def test_showSummary_noCompetition(client, auth_data, competitions_data_test):
+    """
+    Si l'email utilisé pour se logguer est connu,
+    l'utilisateur est redirigé vers l'accueil.
+    Vérifie que la page affichée est bien la page d'accueil.
+    Vérifier le message affiché si aucune competition à venir.
+    """
+    response = client.post('/showSummary', data={'email': auth_data["email"]})
+    assert response.status_code == 200
+    assert b"<title>Summary | GUDLFT Registration</title>" in response.data
+    open_competitions = get_open_competitions(competitions_data_test)
+    # test du flash message
+    assert b"No coming competition" in response.data
 
 
 def test_should_not_login(client, auth_wrongdata):
