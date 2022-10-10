@@ -3,21 +3,24 @@ from Python_Testing import server
 
 
 @pytest.fixture
+def client():
+    new_app = server.app
+    new_app.testing = True
+    with new_app.test_client() as c:
+        yield c
+
+
+@pytest.fixture
 def auth_data():
     login = {"email": "john@simplylift.co"}
     return login
+
 
 @pytest.fixture
 def auth_wrongdata():
     login = {"email": "notexist@yopmail.com"}
     return login
 
-@pytest.fixture
-def client():
-    new_app = server.app
-    new_app.testing = True
-    with new_app.test_client() as c:
-        yield c
 
 @pytest.fixture
 def clubs_data():
@@ -53,31 +56,22 @@ def clubs_data():
 
     ]
 
+
 @pytest.fixture
 def competitions_data():
     return [
-
         {
-
             "name": "Spring Festival",
-
             "date": "2020-03-27 10:00:00",
-
             "numberOfPlaces": "25"
-
         },
-
         {
-
             "name": "Fall Classic",
-
             "date": "2020-10-22 13:30:00",
-
             "numberOfPlaces": "13"
-
         }
-
     ]
+
 
 @pytest.fixture
 def competitions_data_test():
@@ -88,6 +82,7 @@ def competitions_data_test():
             "numberOfPlaces": "30"
         }
     ]
+
 
 @pytest.fixture
 def compet_complete():
@@ -104,6 +99,7 @@ def compet_open():
             "numberOfPlaces": "20"}
     return compet
 
+
 @pytest.fixture
 def compet_open_5():
     compet = {"name": "Spring Festival",
@@ -111,12 +107,14 @@ def compet_open_5():
             "numberOfPlaces": "5"}
     return compet
 
+
 @pytest.fixture
 def club_20():
     club = {"name":"Simply Lift",
         "email":"john@simplylift.co",
         "points":"20"}
     return club
+
 
 @pytest.fixture
 def club_1():

@@ -7,14 +7,14 @@ import datetime
 import requests
 from flask import session
 
-"""
+
 def test_loadClubs(clubs_data):
     assert loadClubs() == clubs_data
 
 
 def test_loadCompetitions(competitions_data):
     assert loadCompetitions() == competitions_data
-"""
+
 
 def test_index(client):
     """
@@ -108,10 +108,10 @@ def test_purchasePlaces_complete(compet_complete, club_20, client):
     """
     club = club_20
     competition = compet_complete
-    placesRequired = 3
+    places_required = 3
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
+            'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     html = response.data.decode()
@@ -125,33 +125,33 @@ def test_purchasePlaces_required0(compet_open, club_20, client):
     """
     club = club_20
     competition = compet_open
-    placesRequired = 0
+    places_required = 0
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
+            'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     html = response.data.decode()
     assert "Something went wrong" in html
 
 
-def test_purchasePlaces_required_toomuch(compet_open_5, club_20, client):
+def test_purchasePlaces_noMorePlaces(compet_open_5, club_20, client):
     """
     club ne peut pas réserver plus que de places disponibles
     """
     club = club_20
     competition = compet_open_5
-    placesRequired = 7
+    places_required = 7
     points_before = int(club['points'])
     places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
+            'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    html = response.data.decode()
+    data = response.data.decode()
     # placesRequired>places_before:
-    assert "Something went wrong" in html
+    assert data.find("Something went wrong") != -1
 
 
 def test_purchasePlaces_limit12(compet_open, club_20, client):
@@ -160,12 +160,12 @@ def test_purchasePlaces_limit12(compet_open, club_20, client):
     """
     club = club_20
     competition = compet_open
-    placesRequired = 13
+    places_required = 13
     points_before = int(club['points'])
     places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
+            'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     data = response.data.decode()
@@ -179,19 +179,16 @@ def test_purchasePlaces_NotEnoughPoints(compet_open, club_1, client):
     """
     club = club_1
     competition = compet_open
-    placesRequired = 2
+    places_required = 2
     points_before = int(club['points'])
     places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
-    response = client.post('/purchasePlaces', data=form, follow_redirects=True)
+            'places': places_required}
+    response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    html = response.data.decode()
-    # html = response.content
     # points_before > placesRequired
-    assert "Not enough points" in html
-    # assert re.search('Not enough points', response.get_data(as_text=True)) == True
+    assert b"Not enough points" in response.data
 
 
 def test_purchasePlaces_OK(compet_open, club_1, client):
@@ -200,12 +197,12 @@ def test_purchasePlaces_OK(compet_open, club_1, client):
     """
     club = club_1
     competition = compet_open
-    placesRequired = 1
+    places_required = 1
     points_before = int(club['points'])
     places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
-            'places': placesRequired}
+            'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     data = response.data.decode()
@@ -214,11 +211,12 @@ def test_purchasePlaces_OK(compet_open, club_1, client):
     # placesRequired <= places_before : assez de places dispo
     assert data.find("Great-booking complete!") != -1
     """ verifier que le nbr de points est mis à jour"""
-    assert club['points'] == (points_before - placesRequired)
+    new_points = points_before - places_required
+    assert club['points'] == new_points
     message = 'Points available: ' + str(club['points'])
     assert message in data
     """ vérifier que le nbr de places est mis à jour"""
-    assert competition['numberOfPlaces'] == (places_before - placesRequired)
+    assert competition['numberOfPlaces'] == (places_before - places_required)
 
 
 def test_pointsBoard(client, clubs_data):
