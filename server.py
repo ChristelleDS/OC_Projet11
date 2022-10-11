@@ -78,19 +78,20 @@ def purchasePlaces():
         return render_template('welcome.html', club=club, competitions=competitions)
     # Nombre de place demandé >= 0 et < 12
     # et < au nombre de places disponibles
-    if placesRequired <= 0 or placesRequired > 12\
+    elif placesRequired <= 0 or placesRequired > 12\
             or placesRequired > placesAvailable:
         flash('Something went wrong : incorrect number of places')
         return render_template('booking.html', club=club, competition=competition)
     # UC: club n'a pas assez de points
-    if placesRequired > club_points:
+    elif placesRequired > club_points:
         flash('No enough points!')
         return render_template('booking.html', club=club, competition=competition)
     # cas passant: maj points
-    competition['numberOfPlaces'] = placesAvailable-placesRequired
-    club['points'] = club_points-placesRequired
-    flash('Great-booking complete!')
-    return render_template('welcome.html', club=club, competitions=competitions)
+    else:
+        competition['numberOfPlaces'] = placesAvailable-placesRequired
+        club['points'] = club_points-placesRequired
+        flash('Great-booking complete!')
+        return render_template('welcome.html', club=club, competitions=competitions)
 
 
 @app.route('/pointsBoard')
