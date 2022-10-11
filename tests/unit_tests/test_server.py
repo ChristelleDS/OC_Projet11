@@ -147,7 +147,7 @@ def test_purchasePlaces_noMorePlaces(compet_open_5, club_20, client):
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': places_required}
-    response = client.post('/purchasePlaces', data=form)
+    response = client.post('/purchasePlaces', data=form, follow_redirects=True)
     assert response.status_code == 200
     data = response.data.decode()
     # placesRequired>places_before:
