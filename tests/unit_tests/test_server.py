@@ -1,11 +1,13 @@
 from Python_Testing.server import index, logout, loadCompetitions, loadClubs, book, purchasePlaces, \
-    convert_strToDate, get_open_competitions
+    convert_strToDate, get_open_competitions, competitions
 from .conftest import auth_data, client, clubs_data, competitions_data, \
     compet_complete, compet_open, competitions_data_test, club_20, club_1, compet_open_5
 import pytest
 import datetime
 import requests
 from flask import session
+
+from ... import server
 
 
 def test_loadClubs(clubs_data):
@@ -44,22 +46,21 @@ def test_showSummary(client, auth_data, competitions_data):
         assert c['name'] in data
 
 
-def test_showSummary_noCompetition(client, auth_data, competitions_data_test):
+def test_showSummary_noCompetition(client, auth_data, mocker, competitions_data_test):
     """
     Si l'email utilisé pour se logguer est connu,
     l'utilisateur est redirigé vers l'accueil.
     Vérifie que la page affichée est bien la page d'accueil.
     Vérifier le message affiché si aucune competition à venir.
     """
+    mocker.patch.object(server, 'competitions', competitions_data_test)
     response = client.post('/showSummary', data={'email': auth_data["email"]})
     assert response.status_code == 200
     data = response.data.decode()
     print(response.data)
     assert "<title>Summary | GUDLFT Registration</title>" in data
-    open_competitions = get_open_competitions(competitions_data_test)
     # test du flash message
     assert "No coming competition" in data
-
 
 def test_should_not_login(client, auth_wrongdata):
     """
