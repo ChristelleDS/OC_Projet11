@@ -6,7 +6,7 @@
 </head>
 <body>
         <h2>Welcome, {{club['email']}} </h2><a href="{{url_for('logout')}}">Logout</a>
-
+    <div id="flash_mess">
     {% with messages = get_flashed_messages()%}
     {% if messages %}
         <ul>
@@ -15,6 +15,8 @@
         {% endfor %}
        </ul>
     {% endif%}
+    {%endwith%}
+    </div>
     <p id="Nb_avail_points">Points available: {{club['points']}}</p>
     <h3>Competitions:</h3>
     <ul>
@@ -30,7 +32,7 @@
         <hr />
         {% endfor %}
     </ul>
-    {%endwith%}
+
 
 </body>
 </html>
