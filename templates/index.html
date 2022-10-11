@@ -12,6 +12,7 @@
         <input type="email" name="email" id="email_input"/>
         <button type="submit" id="email_validation">Enter</button>
     </form>
+    <div id="flash_mess">
         {% with messages = get_flashed_messages()%}
         {% if messages %}
             <ul>
@@ -21,5 +22,6 @@
            </ul>
         {% endif%}
         {%endwith%}
+    </div>
 </body>
 </html>
