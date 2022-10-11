@@ -62,7 +62,7 @@ def competitions_data():
     return [
         {
             "name": "Spring Festival",
-            "date": "2020-03-27 10:00:00",
+            "date": "2023-03-27 10:00:00",
             "numberOfPlaces": "25"
         },
         {

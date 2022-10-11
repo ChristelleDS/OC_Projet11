@@ -37,10 +37,11 @@ def test_showSummary(client, auth_data, competitions_data):
     """
     response = client.post('/showSummary', data={'email': auth_data["email"]})
     assert response.status_code == 200
-    assert b"<title>Summary | GUDLFT Registration</title>" in response.data
+    data = response.data.decode()
+    assert "<title>Summary | GUDLFT Registration</title>" in data
     open_competitions = get_open_competitions(competitions_data)
     for c in open_competitions:
-        assert c['name'] in response.data
+        assert c['name'] in data
 
 
 def test_showSummary_noCompetition(client, auth_data, competitions_data_test):
@@ -52,10 +53,12 @@ def test_showSummary_noCompetition(client, auth_data, competitions_data_test):
     """
     response = client.post('/showSummary', data={'email': auth_data["email"]})
     assert response.status_code == 200
-    assert b"<title>Summary | GUDLFT Registration</title>" in response.data
+    data = response.data.decode()
+    print(response.data)
+    assert "<title>Summary | GUDLFT Registration</title>" in data
     open_competitions = get_open_competitions(competitions_data_test)
     # test du flash message
-    assert b"No coming competition" in response.data
+    assert "No coming competition" in data
 
 
 def test_should_not_login(client, auth_wrongdata):
@@ -147,11 +150,11 @@ def test_purchasePlaces_noMorePlaces(compet_open_5, club_20, client):
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': places_required}
-    response = client.post('/purchasePlaces', data=form, follow_redirects=True)
+    response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    data = response.data.decode()
+    html = response.data.decode()
     # placesRequired>places_before:
-    assert data.find("Something went wrong") != -1
+    assert 'Something went wrong' in html
 
 
 def test_purchasePlaces_limit12(compet_open, club_20, client):
