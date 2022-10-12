@@ -1,11 +1,12 @@
 from Python_Testing.server import index, logout, loadCompetitions, loadClubs, book, purchasePlaces, \
-    convert_strToDate, get_open_competitions, competitions
+    convert_strToDate, get_open_competitions, competitions, clubs
 from .conftest import auth_data, client, clubs_data, competitions_data, \
-    compet_complete, compet_open, competitions_data_test, club_20, club_1, compet_open_5
+    compet_complete, compet_open, competitions_data_test, club_20, club_1, \
+    compet_open_5, captured_templates
 import pytest
 import datetime
 import requests
-from flask import session
+from flask import url_for
 
 from ... import server
 
@@ -57,7 +58,6 @@ def test_showSummary_noCompetition(client, auth_data, mocker, competitions_data_
     response = client.post('/showSummary', data={'email': auth_data["email"]})
     assert response.status_code == 200
     data = response.data.decode()
-    print(response.data)
     assert "<title>Summary | GUDLFT Registration</title>" in data
     # test du flash message
     assert "No coming competition" in data
@@ -82,11 +82,10 @@ def test_logout_redirect(client):
     # Check that there was one redirect response.
     assert len(response.history) == 1
     # Check that the second request was to the index page.
-    assert response.request.path == "/"
+    assert response.request.path == url_for("index")
 
 
 def test_book_status(client):
-    print(compet_open)
     competition_tobook = "Spring Festival"
     club_connected = "Simply Lift"
     # assert club_connected in clubs_data
@@ -139,19 +138,20 @@ def test_purchasePlaces_required0(compet_open, club_20, client):
     assert "Something went wrong" in html
 
 
-def test_purchasePlaces_noMorePlaces(compet_open_5, club_20, client):
+def test_purchasePlaces_noMorePlaces(client, mocker, compet_open_5, club_20):
     """
     club ne peut pas réserver plus que de places disponibles
     """
+    mocker.patch.object(server, 'competitions', compet_open_5)
+    mocker.patch.object(server, 'clubs', club_20)
     club = club_20
     competition = compet_open_5
     places_required = 7
-    points_before = int(club['points'])
-    places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
+    print(response.data)
     assert response.status_code == 200
     html = response.data.decode()
     # placesRequired>places_before:
@@ -177,22 +177,24 @@ def test_purchasePlaces_limit12(compet_open, club_20, client):
     assert data.find("Something went wrong") != -1
 
 
-def test_purchasePlaces_NotEnoughPoints(compet_open, club_1, client):
+def test_purchasePlaces_NotEnoughPoints(mocker, compet_open, club_1, client):
     """
     UC4: club n'a pas assez de points
     """
+    mocker.patch.object(server, 'competitions', compet_open)
+    mocker.patch.object(server, 'clubs', club_1)
     club = club_1
     competition = compet_open
     places_required = 2
-    points_before = int(club['points'])
-    places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
+    print(response.data)
+    data = response.data.decode()
     # points_before > placesRequired
-    assert b"Not enough points" in response.data
+    assert data.find("Not enough points") != -1
 
 
 def test_purchasePlaces_OK(compet_open, club_1, client):
@@ -217,7 +219,7 @@ def test_purchasePlaces_OK(compet_open, club_1, client):
     """ verifier que le nbr de points est mis à jour"""
     new_points = points_before - places_required
     assert club['points'] == new_points
-    message = 'Points available: ' + str(club['points'])
+    message = 'Points available: ' + str(new_points)
     assert message in data
     """ vérifier que le nbr de places est mis à jour"""
     assert competition['numberOfPlaces'] == (places_before - places_required)

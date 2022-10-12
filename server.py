@@ -39,7 +39,7 @@ def get_open_competitions(competitions):
 
 @app.route('/showSummary',methods=['POST'])
 def showSummary():
-    # check given email is an authorized login
+    # check given email is an authorized login and correct format
     try:
         club = [club for club in clubs if club['email'] == request.form['email']][0]
         # affichage des compétitions futures

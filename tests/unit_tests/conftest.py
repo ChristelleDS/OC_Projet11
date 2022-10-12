@@ -1,5 +1,6 @@
 import pytest
 from Python_Testing import server
+from flask import template_rendered
 
 
 @pytest.fixture
@@ -122,3 +123,17 @@ def club_1():
         "email":"john@simplylift.co",
         "points":"1"}
     return club
+
+
+@pytest.fixture
+def captured_templates(app):
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
+
+    template_rendered.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)
