@@ -1,8 +1,8 @@
 from Python_Testing.server import index, logout, loadCompetitions, loadClubs, book, purchasePlaces, \
-    convert_strToDate, get_open_competitions, competitions, clubs
+    convert_strToDate, get_open_competitions, competitions, clubs, update_points, update_places
 from .conftest import auth_data, client, clubs_data, competitions_data, \
     compet_complete, compet_open, competitions_data_test, club_20, club_1, \
-    compet_open_5, captured_templates
+    compet_open_5
 import pytest
 import datetime
 import requests
@@ -72,6 +72,7 @@ def test_showSummary_noCompetition(client, auth_data, mocker, competitions_data_
     # test du flash message
     assert "No coming competition" in data
 
+
 def test_should_not_login(client, auth_wrongdata):
     """
     Si l'email utilisé pour se logguer est inconnu (IndexError),
@@ -98,8 +99,6 @@ def test_logout_redirect(client):
 def test_book_status(client):
     competition_tobook = "Spring Festival"
     club_connected = "Simply Lift"
-    # assert club_connected in clubs_data
-    # assert competition_tobook in competitions_data
     book_url = '/book/' + str(competition_tobook) + '/' + str(club_connected)
     response = client.get(book_url)
     assert response.status_code == 200
@@ -115,21 +114,20 @@ def test_book_wrongdata(client):
         response = client.get(book_url)
 
 
-def test_purchasePlaces_complete(compet_complete, club_20, client):
+def test_purchasePlaces_complete(mocker, compet_complete, club_20, client):
     """
     UC: compétition complète
     """
-    club = club_20
-    competition = compet_complete
-    places_required = 3
-    form = {'club': club['name'],
-            'competition': competition['name'],
+    mocker.patch.object(server, 'clubs', club_20)
+    mocker.patch.object(server, 'competitions', compet_complete)
+    places_required = '3'
+    form = {'club': club_20['name'],
+            'competition': compet_complete['name'],
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    html = response.data.decode()
-    if int(competition['numberOfPlaces']) <= 0:
-        assert html.find("complete") != -1
+    print(response.data)
+    assert b"complete" in response.data
 
 
 def test_purchasePlaces_required0(compet_open, club_20, client):
@@ -143,6 +141,7 @@ def test_purchasePlaces_required0(compet_open, club_20, client):
             'competition': competition['name'],
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
+    print(response.data)
     assert response.status_code == 200
     html = response.data.decode()
     assert "Something went wrong" in html
@@ -175,13 +174,12 @@ def test_purchasePlaces_limit12(compet_open, club_20, client):
     club = club_20
     competition = compet_open
     places_required = 13
-    points_before = int(club['points'])
-    places_before = int(competition['numberOfPlaces'])
     form = {'club': club['name'],
             'competition': competition['name'],
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
+    print(response.data)
     data = response.data.decode()
     # placeRequired > 12
     assert data.find("Something went wrong") != -1
