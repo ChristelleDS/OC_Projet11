@@ -3,10 +3,10 @@ from selenium.webdriver.common.by import By
 import time
 
 
-browser = webdriver.Firefox()
+browser = webdriver.Firefox(executable_path=r'C:\Users\chris\OneDrive\Documents\OCP11\Projet11\Python_Testing\tests\Functional_tests\geckodriver.exe')
 
 
-def test_loadBoard_loginKO_loginOK(browser):
+def test_loadBoard_loginKO_loginOK():
     # USE CASE 1:
     # Visit the points board page
     # Login with incorrect email
@@ -47,5 +47,3 @@ def test_loadBoard_loginKO_loginOK(browser):
 
     # welcome page
     assert 'Summary' in browser.title
-    browser.quit()
-    return True
