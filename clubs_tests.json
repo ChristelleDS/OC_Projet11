@@ -3,9 +3,9 @@
         {
             "name": "Simply Lift",
             "email": "john@simplylift.co",
-            "points": "13",
+            "points": "15",
             "bookings": {
-                "Spring Festival": "20",
+                "Spring Festival": "2",
                 "Fall Classic": "0",
                 "Summer Festival 2022": "0"
             }
@@ -16,7 +16,7 @@
             "points": "4",
             "bookings": {
                 "Spring Festival": "0",
-                "Fall Classic": "0",
+                "Fall Classic": "2",
                 "Summer Festival 2022": "0"
             }
         },
@@ -27,7 +27,7 @@
             "bookings": {
                 "Spring Festival": "0",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "0"
+                "Summer Festival 2022": "5"
             }
         }
     ]

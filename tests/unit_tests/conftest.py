@@ -33,7 +33,17 @@ def clubs_data():
 
             "email":"john@simplylift.co",
 
-            "points":"13"
+            "points":"15",
+
+            "bookings": {
+
+                "Spring Festival": "2",
+
+                "Fall Classic": "0",
+
+                "Summer Festival 2022": "0"
+
+            }
 
         },
 
@@ -43,7 +53,17 @@ def clubs_data():
 
             "email": "admin@irontemple.com",
 
-            "points":"4"
+            "points":"4",
+
+            "bookings": {
+
+                "Spring Festival": "0",
+
+                "Fall Classic": "2",
+
+                "Summer Festival 2022": "0"
+
+            }
 
         },
 
@@ -51,7 +71,17 @@ def clubs_data():
 
             "email": "kate@shelifts.co.uk",
 
-            "points":"12"
+            "points":"12",
+
+            "bookings": {
+
+                "Spring Festival": "0",
+
+                "Fall Classic": "0",
+
+                "Summer Festival 2022": "5"
+
+            }
 
         }
 

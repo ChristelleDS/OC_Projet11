@@ -11,12 +11,22 @@ from flask import url_for
 from ... import server
 
 
-def test_loadClubs(clubs_data):
-    assert loadClubs() == clubs_data
+def test_loadClubs(mocker, clubs_data):
+    """
+    Mock CLUBS file with a test file equals to clubs_data fixture.
+    """
+    mocker.patch.object(server, "clubs_json", 'clubs_tests.json')
+    loaded = loadClubs()
+    assert loaded == clubs_data
 
 
-def test_loadCompetitions(competitions_data):
-    assert loadCompetitions() == competitions_data
+def test_loadCompetitions(mocker, competitions_data):
+    """
+    Mock competititons file with a test file equals to competitions_data fixture.
+    """
+    mocker.patch.object(server, "competitions_json", 'competitions_init.json')
+    loaded = loadCompetitions()
+    assert loaded == competitions_data
 
 
 def test_index(client):
@@ -217,12 +227,12 @@ def test_purchasePlaces_OK(compet_open, club_1, client):
     # placesRequired <= places_before : assez de places dispo
     assert data.find("Great-booking complete!") != -1
     """ verifier que le nbr de points est mis à jour"""
-    new_points = points_before - places_required
-    assert club['points'] == new_points
-    message = 'Points available: ' + str(new_points)
+    updated_pts = points_before - places_required
+    message = 'Points available: ' + str(updated_pts)
     assert message in data
     """ vérifier que le nbr de places est mis à jour"""
-    assert competition['numberOfPlaces'] == (places_before - places_required)
+    updated_places = places_before - places_required
+    assert competition['numberOfPlaces'] == updated_places
 
 
 def test_pointsBoard(client, clubs_data):
