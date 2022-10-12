@@ -47,7 +47,7 @@ def test_loadBoard_loginKO_loginOK(browser):
 
     # welcome page
     assert 'Summary' in browser.title
-    browser.quit()
+    browser.close()
 
 
 def test_loadSummary_bookCompetition(browser):
@@ -98,4 +98,4 @@ def test_loadSummary_bookCompetition(browser):
 
     # check index redirection
     assert 'GUDLFT Registration' in browser.title
-    browser.quit()
+    browser.close()
