@@ -7,6 +7,7 @@ import pytest
 import datetime
 import requests
 from flask import url_for
+import urllib.parse
 
 from ... import server
 
@@ -120,10 +121,14 @@ def test_purchasePlaces_complete(mocker, compet_complete, club_20, client):
     """
     mocker.patch.object(server, 'clubs', club_20)
     mocker.patch.object(server, 'competitions', compet_complete)
+    club = club_20['name']
+    compet = compet_complete['name']
     places_required = '3'
-    form = {'club': club_20['name'],
-            'competition': compet_complete['name'],
+    form = {'club': club,
+            'competition': compet,
             'places': places_required}
+    # data = urllib.parse.urlencode(form)
+    # response = client.post('/purchasePlaces', data, content_type="application/x-www-form-urlencoded")
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     print(response.data)
