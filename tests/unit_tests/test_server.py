@@ -178,7 +178,6 @@ def test_purchasePlaces_limit12(compet_open, club_20, client):
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    print(response.data)
     data = response.data.decode()
     # placeRequired > 12
     assert data.find("booking more than 12 places is not authorized") != -1
@@ -198,7 +197,6 @@ def test_purchasePlaces_NotEnoughPoints(compet_open, club_1, client):
             'places': places_required}
     response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
-    print(response.data)
     # points_before > placesRequired
     # assert "Not enough points" in response.data.decode()
 

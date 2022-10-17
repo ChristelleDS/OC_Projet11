@@ -7,22 +7,20 @@
 <body>
     <h2>{{competition['name']}}</h2>
     <p id="Nb_avail_points">Places available: {{competition['numberOfPlaces']}}</p>
-    <div id="flash_mess">
     {% with messages = get_flashed_messages()%}
         {% if messages %}
             <ul>
            {% for message in messages %}
-                <li>{{message}}</li>
+                <li id="flash_mess">{{message}}</li>
             {% endfor %}
            </ul>
         {% endif%}
     {%endwith%}
-    </div>
     {%if competition['numberOfPlaces']|int >0%}
     <form action="/purchasePlaces" method="post">
         <input type="hidden" name="club" value="{{club['name']}}">
         <input type="hidden" name="competition" value="{{competition['name']}}">
-        <label for="places">How many places?</label><input type="number" name="places" id="" min="1" max="12"/>
+        <label for="places">How many places?</label><input type="number" name="places" id="places" min="1" max="12"/>
         <button type="submit" id="Book_validation">Book</button>
     </form>
     {%endif%}

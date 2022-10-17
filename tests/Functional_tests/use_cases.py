@@ -8,13 +8,13 @@ import time
 
 @pytest.fixture(scope="class")
 def browser_init(request):
-    browser = webdriver.Chrome(service=Service(ChromeDriverManager(path=r"drivers").install()))
-    request.cls.driver = browser
-    browser.implicitly_wait(20)
-    browser.maximize_window()
+    driver = webdriver.Chrome(service=Service(ChromeDriverManager(path=r"drivers").install()))
+    request.cls.driver = driver
+    driver.implicitly_wait(20)
+    driver.maximize_window()
     yield
-    browser.close()
-    browser.quit()
+    driver.close()
+    driver.quit()
 
 
 @pytest.mark.usefixtures("browser_init")
@@ -28,34 +28,32 @@ class TestBoardLogin:
         # Welcome Page
 
         # Load the BOARD page
-        self.browser.get('http://127.0.0.1:5000/pointsBoard')
-        assert 'Clubs Board' in self.browser.title
-        self.browser.find_element(By.ID, 'index_link').click()
-        time.sleep(2)
+        self.driver.get('http://127.0.0.1:5000/pointsBoard')
+        assert 'Clubs Board' in self.driver.title
+        self.driver.find_element(By.ID, 'index_link').click()
+        time.sleep(1)
 
         # Load the login page
-        assert 'GUDLFT Registration' in self.browser.title
-        time.sleep(2)
+        assert 'GUDLFT Registration' in self.driver.title
 
         # Find the email input field and write an invalid email
-        self.browser.find_element(By.NAME, 'email').send_keys('johnsimplylift.co')
+        self.driver.find_element(By.NAME, 'email').send_keys('johnsimply@lift')
 
         # Find the validation button and click on
-        self.browser.find_element(By.ID, 'email_validation').click()
-        time.sleep(2)
+        self.driver.find_element(By.ID, 'email_validation').click()
 
         # check the flash error message
-        flash_info = self.browser.find_element(By.ID, 'flash_mess')
-        flash_info_content = flash_info.text
-        assert "Login error" in flash_info_content
+        # flash_info = self.driver.find_element(By.ID, 'flash_mess').text
+        assert "Login error" in self.driver.find_element(By.ID, 'flash_mess').text
+        # assert "Login error" in self.driver.find_element(By.TAG_NAME, "li").text
 
         # write a valid email and click on validation button
-        self.browser.find_element(By.NAME, 'email').send_keys('john@simplylift.co')
-        self.browser.find_element(By.ID, 'email_validation').click()
-        time.sleep(3)
+        self.driver.find_element(By.NAME, 'email').send_keys('john@simplylift.co')
+        self.driver.find_element(By.ID, 'email_validation').click()
+        time.sleep(1)
 
         # welcome page
-        assert 'Summary' in self.browser.title
+        assert 'Summary' in self.driver.title
 
     def test_loadSummary_bookCompetition(self):
         # USE CASE 2:
@@ -64,36 +62,34 @@ class TestBoardLogin:
         # Logout
 
         # Login
-        self.browser.get('http://127.0.0.1:5000/')
-        self.browser.find_element(By.NAME, 'email').send_keys('john@simplylift.co')
-        self.browser.find_element(By.ID, 'email_validation').click()
-        time.sleep(3)
+        self.driver.get('http://127.0.0.1:5000/')
+        self.driver.find_element(By.NAME, 'email').send_keys('john@simplylift.co')
+        self.driver.find_element(By.ID, 'email_validation').click()
+        time.sleep(1)
 
         # Load Summary page
-        assert 'Summary' in self.browser.title
-        init_points = self.browser.find_element(By.ID, 'Nb_avail_points')
-        self.browser.find_element(By.LINK_TEXT, 'Book Places').click()
-        time.sleep(3)
+        assert 'Summary' in self.driver.title
+        init_points = int(self.driver.find_element(By.ID, 'Nb_avail_points').text[-2:])
+        self.driver.find_element(By.LINK_TEXT, 'Book Places').click()
+        time.sleep(1)
 
         # Load booking page
-        assert 'Booking' in self.browser.title
+        assert 'Booking' in self.driver.title
         nb_places = 2
-        self.browser.find_element(By.NAME, 'places').send_keys(nb_places)
-        self.browser.find_element(By.ID, 'Book_validation').click()
-        time.sleep(3)
+        self.driver.find_element(By.NAME, 'places').send_keys(nb_places)
+        self.driver.find_element(By.ID, 'Book_validation').click()
+        time.sleep(1)
 
         # Check redirection to summary and check points update
-        assert 'Summary' in self.browser.title
-        new_points = self.browser.find_element(By.ID, 'Nb_avail_points')
-        assert new_points == init_points - nb_places
+        assert 'Summary' in self.driver.title
+        avail_pts = int(self.driver.find_element(By.ID, 'Nb_avail_points').text[-2:])
+        assert avail_pts == (init_points - nb_places)
 
         # check the flash message
-        flash_info = self.browser.find_element(By.ID, 'flash_mess')
-        flash_info_content = flash_info.text
-        assert "booking complete" in flash_info_content
+        assert "booking complete" in self.driver.find_element(By.ID, 'flash_mess').text
 
         # logout
-        self.browser.find_element(By.LINK_TEXT, 'Logout').click()
+        self.driver.find_element(By.LINK_TEXT, 'Logout').click()
 
         # check index redirection
-        assert 'GUDLFT Registration' in self.browser.title
+        assert 'GUDLFT Registration' in self.driver.title
