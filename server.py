@@ -109,6 +109,7 @@ def book(competition, club):
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
     club = [c for c in clubs if c['name'] == request.form['club']][0]
+    club_bookings = int(club['bookings'][competition['name']])  # places already booked
     placesRequired = int(request.form['places'])
     placesAvailable = int(competition['numberOfPlaces'])
     club_points = int(club['points'])
@@ -117,10 +118,13 @@ def purchasePlaces():
     if placesAvailable <= 0:
         flash('Sorry, complete tournament!')
         return render_template('welcome.html', club=club, competitions=competitions_futures)
-    # Nombre de place demandé >= 0 et < 12
+    # can't book more than 12 places for a competition
+    elif club_bookings + placesRequired > 12:
+        flash('booking more than 12 places is not authorized')
+        return render_template('booking.html', club=club, competition=competition)
+    # Nombre de place demandé >= 0
     # et < au nombre de places disponibles
-    elif placesRequired <= 0 or placesRequired > 12\
-            or placesRequired > placesAvailable:
+    elif placesRequired <= 0 or placesRequired > placesAvailable:
         flash('Something went wrong : incorrect number of places')
         return render_template('booking.html', club=club, competition=competition)
     # UC: club n'a pas assez de points
@@ -131,7 +135,7 @@ def purchasePlaces():
     else:
         competition['numberOfPlaces'] = placesAvailable-placesRequired
         club['points'] = club_points-placesRequired
-        booking_saving = int(club['bookings'][competition['name']]) + placesRequired
+        booking_saving = club_bookings + placesRequired
         update_places(places=str(competition['numberOfPlaces']),
                       compet_index=competitions.index(competition))
         update_points(points=str(club['points']),
