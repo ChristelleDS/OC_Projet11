@@ -194,8 +194,8 @@ def test_purchasePlaces_NotEnoughPoints(mocker, compet_open, club_1, client):
     """
     UC4: club n'a pas assez de points
     """
-    mocker.patch.object(server, 'competitions', compet_open)
-    mocker.patch.object(server, 'clubs', club_1)
+    #mocker.patch.object(server, 'competitions', compet_open)
+    #mocker.patch.object(server, 'clubs', club_1)
     club = club_1
     competition = compet_open
     places_required = 2
