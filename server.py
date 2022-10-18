@@ -105,6 +105,43 @@ def book(competition, club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
+def is_booking_authorized(competition, club, placesRequired):
+    """
+    Check if the club is authorized to book the number of places required
+    :param competition: current competition dict
+    :param club: current club dict
+    :param placesRequired: nb of places required
+    :return: True(authorized) or False, and the flash message to raise
+    """
+    competition = competition
+    club = club
+    placesRequired = placesRequired
+    placesAvailable = int(competition['numberOfPlaces'])
+    club_points = int(club['points'])
+    club_bookings = int(club['bookings'][competition['name']])  # places already booked
+    # Tournament is complete
+    if placesAvailable <= 0:
+        message = 'Sorry, complete tournament!'
+        return False, message
+    # can't book more than 12 places for a competition
+    elif club_bookings + placesRequired > 12:
+        message = 'booking more than 12 places is not authorized'
+        return False, message
+    # Required places >= 0
+    # and < available places
+    elif placesRequired <= 0 or placesRequired > placesAvailable:
+        message = 'Something went wrong : incorrect number of places'
+        return False, message
+    # club has not enough points
+    elif placesRequired > club_points:
+        message = 'No enough points!'
+        return False, message
+    # Booking conditions OK
+    else:
+        message = 'Great-booking complete!'
+        return True, message
+
+
 @app.route('/purchasePlaces', methods=['POST'])
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
@@ -114,36 +151,23 @@ def purchasePlaces():
     placesAvailable = int(competition['numberOfPlaces'])
     club_points = int(club['points'])
     competitions_futures = get_open_competitions(competitions)
-    # UC: tournoi complet
-    if placesAvailable <= 0:
-        flash('Sorry, complete tournament!')
-        return render_template('welcome.html', club=club, competitions=competitions_futures)
-    # can't book more than 12 places for a competition
-    elif club_bookings + placesRequired > 12:
-        flash('booking more than 12 places is not authorized')
-        return render_template('booking.html', club=club, competition=competition)
-    # Nombre de place demandé >= 0
-    # et < au nombre de places disponibles
-    elif placesRequired <= 0 or placesRequired > placesAvailable:
-        flash('Something went wrong : incorrect number of places')
-        return render_template('booking.html', club=club, competition=competition)
-    # UC: club n'a pas assez de points
-    elif placesRequired > club_points:
-        flash('No enough points!')
-        return render_template('booking.html', club=club, competition=competition)
-    # cas passant: maj points
-    else:
-        competition['numberOfPlaces'] = placesAvailable-placesRequired
-        club['points'] = club_points-placesRequired
-        booking_saving = club_bookings + placesRequired
+    authorized = is_booking_authorized(competition, club, placesRequired)[0]
+    message = is_booking_authorized(competition, club, placesRequired)[1]
+    flash(message)
+    if authorized is True:
+        # update club points + update places available in the competition
+        competition['numberOfPlaces'] = placesAvailable - placesRequired
+        club['points'] = club_points - placesRequired
+        places_book = club_bookings + placesRequired
         update_places(places=str(competition['numberOfPlaces']),
                       compet_index=competitions.index(competition))
         update_points(points=str(club['points']),
-                      bookings=str(booking_saving),
+                      bookings=str(places_book),
                       club_index=clubs.index(club),
                       compet=competition['name'])
-        flash('Great-booking complete!')
         return render_template('welcome.html', club=club, competitions=competitions_futures)
+    else:
+        return render_template('booking.html', club=club, competition=competition)
 
 
 @app.route('/pointsBoard')
