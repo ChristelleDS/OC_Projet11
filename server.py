@@ -41,6 +41,42 @@ def book(competition,club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
+def is_booking_authorized(competition, club, placesRequired):
+    """
+    Check if the club is authorized to book the number of places required
+    :param competition: current competition dict
+    :param club: current club dict
+    :param placesRequired: nb of places required
+    :return: True(authorized) or False, and the flash message to raise
+    """
+    competition = competition
+    club = club
+    placesRequired = placesRequired
+    placesAvailable = int(competition['numberOfPlaces'])
+    club_points = int(club['points'])
+    # Tournament is complete
+    if placesAvailable <= 0:
+        message = 'Sorry, complete tournament!'
+        return False, message
+    # can't book more than 12 places for a competition
+    elif placesRequired > 12:
+        message = 'booking more than 12 places is not authorized'
+        return False, message
+    # Required places >= 0
+    # and < available places
+    elif placesRequired <= 0 or placesRequired > placesAvailable:
+        message = 'Something went wrong : incorrect number of places'
+        return False, message
+    # club has not enough points
+    elif placesRequired > club_points:
+        message = 'No enough points!'
+        return False, message
+    # Booking conditions OK
+    else:
+        message = 'Great-booking complete!'
+        return True, message
+
+
 @app.route('/purchasePlaces',methods=['POST'])
 def purchasePlaces():
     competition = [c for c in competitions if c['name'] == request.form['competition']][0]
@@ -48,29 +84,15 @@ def purchasePlaces():
     placesRequired = int(request.form['places'])
     placesAvailable = int(competition['numberOfPlaces'])
     club_points = int(club['points'])
-    # UC: tournoi complet
-    if placesAvailable <= 0:
-        flash('Sorry, complete tournament!')
-        return render_template('welcome.html', club=club, competitions=competitions)
-    # Nombre de place demandé doit être + et inférieur à 12
-    # et inférieur au nombre de places disponibles
-    elif placesRequired <= 0 or placesRequired > 12\
-            or placesRequired > placesAvailable:
-        flash('Something went wrong : incorrect number of places')
-        return render_template('booking.html', club=club, competition=competition)
-    # UC: club n'a pas assez de points
-    elif placesRequired > club_points:
-        flash('No enough points!')
-        return render_template('booking.html', club=club, competition=competition)
-    # cas passant: maj points
-    else:
+    authorized = is_booking_authorized(competition, club, placesRequired)[0]
+    message = is_booking_authorized(competition, club, placesRequired)[1]
+    flash(message)
+    if authorized is True:
         competition['numberOfPlaces'] = placesAvailable-placesRequired
         club['points'] = club_points-placesRequired
-        flash('Great-booking complete!')
         return render_template('welcome.html', club=club, competitions=competitions)
-
-
-# TODO: Add route for points display
+    else:
+        return render_template('booking.html', club=club, competition=competition)
 
 
 @app.route('/logout')
