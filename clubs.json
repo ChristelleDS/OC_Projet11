@@ -7,7 +7,8 @@
             "bookings": {
                 "Spring Festival": "4",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "0"
+                "Complete competition": "0",
+                "Competition 5 places": "0"
             }
         },
         {
@@ -17,17 +18,19 @@
             "bookings": {
                 "Spring Festival": "0",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "0"
+                "Complete competition": "0",
+                "Competition 5 places": "0"
             }
         },
         {
             "name": "She Lifts",
             "email": "kate@shelifts.co.uk",
-            "points": "11",
+            "points": "8",
             "bookings": {
-                "Spring Festival": "1",
+                "Spring Festival": "4",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "0"
+                "Complete competition": "0",
+                "Competition 5 places": "0"
             }
         }
     ]
