@@ -116,8 +116,8 @@ def competitions_data_test():
 
 @pytest.fixture
 def compet_complete():
-    compet = {"name": "Spring Festival",
-            "date": "2022-10-27 10:00:00",
+    compet = {"name": "complete festival",
+            "date": "2022-11-27 10:00:00",
             "numberOfPlaces": "0"}
     return compet
 

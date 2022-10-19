@@ -105,7 +105,7 @@ def book(competition, club):
         return render_template('welcome.html', club=club, competitions=competitions)
 
 
-def is_booking_authorized(competition, club, placesRequired):
+def is_booking_authorized(compet, club_jdd, places_required):
     """
     Check if the club is authorized to book the number of places required
     :param competition: current competition dict
@@ -113,9 +113,9 @@ def is_booking_authorized(competition, club, placesRequired):
     :param placesRequired: nb of places required
     :return: True(authorized) or False, and the flash message to raise
     """
-    competition = competition
-    club = club
-    placesRequired = placesRequired
+    competition = compet
+    club = club_jdd
+    placesRequired = places_required
     placesAvailable = int(competition['numberOfPlaces'])
     club_points = int(club['points'])
     club_bookings = int(club['bookings'][competition['name']])  # places already booked
@@ -130,11 +130,11 @@ def is_booking_authorized(competition, club, placesRequired):
     # Required places >= 0
     # and < available places
     elif placesRequired <= 0 or placesRequired > placesAvailable:
-        message = 'Something went wrong : incorrect number of places'
+        message = 'No more places available for this competition, incorrect number'
         return False, message
     # club has not enough points
     elif placesRequired > club_points:
-        message = 'No enough points!'
+        message = 'Not enough points!'
         return False, message
     # Booking conditions OK
     else:

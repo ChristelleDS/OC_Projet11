@@ -1,5 +1,6 @@
-from Python_Testing.server import index, logout, loadCompetitions, loadClubs, book, purchasePlaces, \
-    convert_strToDate, get_open_competitions, competitions, clubs, update_points, update_places
+from Python_Testing.server import index, logout, loadCompetitions, loadClubs, \
+    book, purchasePlaces, convert_strToDate, get_open_competitions, competitions,\
+    clubs, update_points, update_places, is_booking_authorized
 from .conftest import auth_data, client, clubs_data, competitions_data, \
     compet_complete, compet_open, competitions_data_test, club_20, club_1, \
     compet_open_5
@@ -28,6 +29,19 @@ def test_loadCompetitions(mocker, competitions_data):
     mocker.patch.object(server, "competitions_json", 'competitions_init.json')
     loaded = loadCompetitions()
     assert loaded == competitions_data
+
+
+def test_update_points():
+    update_points("20", "4", 0, "Spring Festival")  # points, bookings, club_index, compet
+    clubs = loadClubs()
+    assert clubs[0]['points'] == '20'
+    assert clubs[0]['bookings']['Spring Festival'] == '4'
+
+
+def test_update_places():
+    update_places("30", 0)  # places, compet_index
+    competitions = loadCompetitions()
+    assert competitions[0]['numberOfPlaces'] == '30'
 
 
 def test_index(client):
@@ -114,91 +128,27 @@ def test_book_wrongdata(client):
         response = client.get(book_url)
 
 
-def test_purchasePlaces_complete(mocker, compet_complete, club_20, client):
-    """
-    UC: compétition complète
-    """
-    # mocker.patch.object(server, 'clubs', club_20)
-    # mocker.patch.object(server, 'competitions', compet_complete)
-    club = club_20['name']
-    compet = compet_complete['name']
-    places_required = '3'
-    form = {'club': club,
-            'competition': compet,
-            'places': places_required}
-    # data = urllib.parse.urlencode(form)
-    # response = client.post('/purchasePlaces', data, content_type="application/x-www-form-urlencoded")
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    # assert b"complete" in response.data
-
-
-def test_purchasePlaces_required0(compet_open, club_20, client):
-    """
-    UC1: club qui demande une réservation pour 0 place (non passant)
-    """
-    club = club_20
-    competition = compet_open
-    places_required = 0
-    form = {'club': club['name'],
-            'competition': competition['name'],
-            'places': places_required}
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    # assert "Something went wrong" in response.data.decode()
-
-
-def test_purchasePlaces_noMorePlaces(client, compet_open_5, club_20):
-    """
-    club ne peut pas réserver plus que de places disponibles
-    """
-    # mocker.patch.object(server, 'competitions', compet_open_5)
-    # mocker.patch.object(server, 'clubs', club_20)
-    club = club_20
-    competition = compet_open_5
-    places_required = 7
-    form = {'club': club['name'],
-            'competition': competition['name'],
-            'places': places_required}
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    # placesRequired>places_before:
-    # assert 'Something went wrong' in response.data.decode()
-
-
-def test_purchasePlaces_limit12(compet_open, club_20, client):
-    """
-    Vérifier qu'un club ne peut pas réserver plus de 12 places
-    """
-    club = club_20
-    competition = compet_open
-    places_required = 13
-    form = {'club': club['name'],
-            'competition': competition['name'],
-            'places': places_required}
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    data = response.data.decode()
-    # placeRequired > 12
-    assert data.find("booking more than 12 places is not authorized") != -1
-
-
-def test_purchasePlaces_NotEnoughPoints(compet_open, club_1, client):
-    """
-    UC4: club n'a pas assez de points
-    """
-    # mocker.patch.object(server, 'competitions', compet_open)
-    # mocker.patch.object(server, 'clubs', club_1)
-    club = club_1
-    competition = compet_open
-    places_required = 2
-    form = {'club': club['name'],
-            'competition': competition['name'],
-            'places': places_required}
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    # points_before > placesRequired
-    # assert "Not enough points" in response.data.decode()
+@pytest.mark.parametrize("club_jdd, places_required_jdd, competition_jdd, expected_boolean, expected_message",
+                         [(0, 13, 0, False, "booking more than 12 places is not authorized"),
+                          (0, 2, 2, False, "Sorry, complete tournament!"),
+                          (1, 6, 0, False, "Not enough points!"),
+                          (0, 7, 3, False, "No more places available for this competition, incorrect number"),
+                          (0, 0, 0, False, "No more places available for this competition, incorrect number"),
+                          (0, 1, 0, True, "Great-booking complete!")])
+def test_is_booking_authorized(club_jdd, places_required_jdd, competition_jdd,
+                               expected_boolean, expected_message):
+    # mocker.patch.object(server, 'competitions', competition_jdd)
+    # mocker.patch.object(server, 'clubs', club_jdd)
+    club = clubs[club_jdd]
+    print(club)
+    competition = competitions[competition_jdd]
+    print(competition)
+    value = is_booking_authorized(competition, club, places_required_jdd)[0]
+    print(value)
+    mess = is_booking_authorized(competition, club, places_required_jdd)[1]
+    print(mess)
+    assert value == expected_boolean
+    assert mess  in expected_message
 
 
 def test_purchasePlaces_OK(compet_open, club_1, client):
@@ -207,27 +157,28 @@ def test_purchasePlaces_OK(compet_open, club_1, client):
     """
     # mocker.patch.object(server, 'competitions', compet_open)
     # mocker.patch.object(server, 'clubs', club_1)
-    club = club_1
-    competition = compet_open
+    club = clubs[0]
+    compet = competitions[0]
     places_required = 1
     points_before = int(club['points'])
-    places_before = int(competition['numberOfPlaces'])
+    places_before = int(compet['numberOfPlaces'])
     form = {'club': club['name'],
-            'competition': competition['name'],
+            'competition': compet['name'],
             'places': places_required}
-    response = client.post('/purchasePlaces', data=form, follow_redirects=True)
+    print(form)
+    response = client.post('/purchasePlaces', data=form)
     assert response.status_code == 200
     data = response.data.decode()
     # 0 <= placesRequired <= 12
     # placesRequired >= points_before : le club a assez de points
     # placesRequired <= places_before : assez de places dispo
-    # assert data.find("Great-booking complete!") != -1
+    assert data.find("Great-booking complete!") != -1
     """ verifier que le nbr de points est mis à jour"""
-    # updated_pts = points_before - places_required
-    # assert club['points'] == updated_pts
+    updated_pts = points_before - places_required
+    assert club['points'] == updated_pts
     """ vérifier que le nbr de places est mis à jour"""
-    # updated_places = places_before - places_required
-    # assert competition['numberOfPlaces'] == updated_places
+    updated_places = places_before - places_required
+    assert compet['numberOfPlaces'] == updated_places
 
 
 def test_pointsBoard(client, clubs_data):

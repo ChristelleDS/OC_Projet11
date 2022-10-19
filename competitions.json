@@ -3,12 +3,22 @@
         {
             "name": "Spring Festival",
             "date": "2023-03-27 10:00:00",
-            "numberOfPlaces": "34"
+            "numberOfPlaces": "29"
         },
         {
             "name": "Fall Classic",
             "date": "2020-10-22 13:30:00",
-            "numberOfPlaces": "13"
+            "numberOfPlaces": "2"
+        },
+        {
+            "name": "Complete competition",
+            "date": "2023-10-22 13:30:00",
+            "numberOfPlaces": "0"
+        },
+        {
+            "name": "Competition 5 places",
+            "date": "2023-10-22 13:30:00",
+            "numberOfPlaces": "5"
         }
     ]
 }
