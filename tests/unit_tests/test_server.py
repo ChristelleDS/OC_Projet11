@@ -151,13 +151,11 @@ def test_is_booking_authorized(club_jdd, places_required_jdd, competition_jdd,
     assert mess  in expected_message
 
 
-def test_purchasePlaces_OK(compet_open, club_1, client):
+def test_purchasePlaces_OK(client):
     """
     Cas passant
     """
-    # mocker.patch.object(server, 'competitions', compet_open)
-    # mocker.patch.object(server, 'clubs', club_1)
-    club = clubs[0]
+    club = clubs[2]
     compet = competitions[0]
     places_required = 1
     points_before = int(club['points'])
