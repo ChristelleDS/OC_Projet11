@@ -1,16 +1,14 @@
+from ... import server
 from Python_Testing.server import index, logout, loadCompetitions, loadClubs, \
     book, purchasePlaces, convert_strToDate, get_open_competitions, competitions,\
     clubs, update_points, update_places, is_booking_authorized
-from .conftest import auth_data, client, clubs_data, competitions_data, \
+from Python_Testing.tests.conftest import auth_data, client, clubs_data, competitions_data, \
     compet_complete, compet_open, competitions_data_test, club_20, club_1, \
     compet_open_5
 import pytest
-import datetime
-import requests
 from flask import url_for
-import urllib.parse
 
-from ... import server
+
 
 
 def test_loadClubs(mocker, clubs_data):
@@ -149,34 +147,6 @@ def test_is_booking_authorized(club_jdd, places_required_jdd, competition_jdd,
     print(mess)
     assert value == expected_boolean
     assert mess  in expected_message
-
-
-def test_purchasePlaces_OK(client):
-    """
-    Cas passant
-    """
-    club = clubs[2]
-    compet = competitions[0]
-    places_required = 1
-    points_before = int(club['points'])
-    places_before = int(compet['numberOfPlaces'])
-    form = {'club': club['name'],
-            'competition': compet['name'],
-            'places': places_required}
-    print(form)
-    response = client.post('/purchasePlaces', data=form)
-    assert response.status_code == 200
-    data = response.data.decode()
-    # 0 <= placesRequired <= 12
-    # placesRequired >= points_before : le club a assez de points
-    # placesRequired <= places_before : assez de places dispo
-    assert data.find("Great-booking complete!") != -1
-    """ verifier que le nbr de points est mis à jour"""
-    updated_pts = points_before - places_required
-    assert club['points'] == updated_pts
-    """ vérifier que le nbr de places est mis à jour"""
-    updated_places = places_before - places_required
-    assert compet['numberOfPlaces'] == updated_places
 
 
 def test_pointsBoard(client, clubs_data):

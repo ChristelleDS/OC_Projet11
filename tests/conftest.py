@@ -40,7 +40,11 @@ def clubs_data():
 
                 "Fall Classic": "0",
 
-                "Summer Festival 2022": "0"
+                "Summer Festival 2022": "0",
+
+                "Complete competition": "0",
+
+                "Competition 5 places": "0"
 
             }
 
@@ -60,7 +64,11 @@ def clubs_data():
 
                 "Fall Classic": "2",
 
-                "Summer Festival 2022": "0"
+                "Summer Festival 2022": "0",
+
+                "Complete competition": "0",
+
+                "Competition 5 places": "0"
 
             }
 
@@ -78,7 +86,11 @@ def clubs_data():
 
                 "Fall Classic": "0",
 
-                "Summer Festival 2022": "5"
+                "Summer Festival 2022": "5",
+
+                "Complete competition": "0",
+
+                "Competition 5 places": "0"
 
             }
 
