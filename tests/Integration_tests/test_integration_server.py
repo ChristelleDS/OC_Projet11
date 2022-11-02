@@ -1,8 +1,5 @@
 from Python_Testing.server import competitions, clubs, update_points, update_places
 import pytest
-from Python_Testing.tests.conftest import auth_data, client, clubs_data, competitions_data, \
-    compet_complete, compet_open, competitions_data_test, club_20, club_1, \
-    compet_open_5
 
 
 def test_purchasePlaces_OK(client):
