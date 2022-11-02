@@ -3,11 +3,10 @@
         {
             "name": "Simply Lift",
             "email": "john@simplylift.co",
-            "points": "20",
+            "points": "2",
             "bookings": {
                 "Spring Festival": "4",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "0",
                 "Complete competition": "0",
                 "Competition 5 places": "0"
             }
@@ -18,8 +17,7 @@
             "points": "4",
             "bookings": {
                 "Spring Festival": "0",
-                "Fall Classic": "2",
-                "Summer Festival 2022": "0",
+                "Fall Classic": "0",
                 "Complete competition": "0",
                 "Competition 5 places": "0"
             }
@@ -27,11 +25,10 @@
         {
             "name": "She Lifts",
             "email": "kate@shelifts.co.uk",
-            "points": "12",
+            "points": "7",
             "bookings": {
                 "Spring Festival": "0",
                 "Fall Classic": "0",
-                "Summer Festival 2022": "5",
                 "Complete competition": "0",
                 "Competition 5 places": "0"
             }
