@@ -138,11 +138,11 @@ def test_is_booking_authorized(club_jdd, places_required_jdd, competition_jdd,
     # mocker.patch.object(server, 'competitions', competition_jdd)
     # mocker.patch.object(server, 'clubs', club_jdd)
     club = clubs[club_jdd]
-    print(club)
+    # print(club)
     competition = competitions[competition_jdd]
-    print(competition)
+    # print(competition)
     value = is_booking_authorized(competition, club, places_required_jdd)[0]
-    print(value)
+    # print(value)
     mess = is_booking_authorized(competition, club, places_required_jdd)[1]
     print(mess)
     assert value == expected_boolean
